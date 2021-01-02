@@ -1,5 +1,6 @@
 import React from 'react';
 import { TouchableWithoutFeedback, View } from 'react-native';
+import { useHistory } from "react-router-dom";
 import { Formik } from 'formik';
 import * as yup from 'yup';
 
@@ -8,9 +9,11 @@ import FormikTextInput from './FormikTextInput';
 
 import theme from '../theme';
 
+import useSignIn from '../hooks/useSignIn';
+
 const initialValues = {
-  name: '',
-  pw: '',
+  username: '',
+  password: '',
 };
 
 const styles = {
@@ -39,12 +42,12 @@ const styles = {
 };
 
 const validationSchema = yup.object().shape({
-  name: yup
+  username: yup
     .string()
     .min(3, 'Username must be at least 3 characters')
     .max(10, 'Maximum character count is 10')
     .required('Username is required'),
-  pw: yup
+  password: yup
     .string()
     .min(3, 'Username must be at least 3 characters')
     .max(10, 'Maximum character count is 10')
@@ -54,8 +57,8 @@ const validationSchema = yup.object().shape({
 const SignInForm = ({ onSubmit }) => {
   return (
     <View style={styles.container}>
-      <FormikTextInput name="name" placeholder="Username" style={styles.textInput} />
-      <FormikTextInput name="pw" placeholder="Password" style={styles.textInput}  secureTextEntry />
+      <FormikTextInput name="username" placeholder="Username" style={styles.textInput} />
+      <FormikTextInput name="password" placeholder="Password" style={styles.textInput} secureTextEntry />
       <TouchableWithoutFeedback onPress={onSubmit} >
         <View style={styles.loginButton}>
           <Text style={{ color: theme.colors.textTertiary }} >Login</Text>
@@ -66,11 +69,18 @@ const SignInForm = ({ onSubmit }) => {
 };
 
 const SignIn = () => {
-  const onSubmit = values => {
-    const name = values.name;
-    const pw = values.pw;
+  const history = useHistory();
+  const [ signIn ] = useSignIn();
 
-    console.log(`logging in with: ${name} & ${pw}`);
+  const onSubmit = async (values) => {
+    const { username, password } = values;
+
+    try {
+      const data = await signIn({ variables: { credentials: { username, password }}});
+      if (data) history.push("/");
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   return (
