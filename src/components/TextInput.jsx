@@ -5,6 +5,8 @@ import theme from '../theme';
 
 const styles = StyleSheet.create({
   error: {
+    color: theme.colors.errors.primary,
+    placeholderTextColor: theme.colors.errors.primary,
     borderColor: theme.colors.errors.primary,
     backgroundColor: theme.colors.errors.secondary,
   },
